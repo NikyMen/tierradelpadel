@@ -1,0 +1,100 @@
+import React from 'react';
+import { ShoppingCart, Package, Star } from 'lucide-react';
+import { useCartStore } from '../stores/cartStore';
+import type { Product } from '../types';
+
+interface ProductCardProps {
+  product: Product;
+}
+
+export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
+  const addItem = useCartStore((state) => state.addItem);
+
+  const handleAddToCart = () => {
+    addItem(product, 1);
+  };
+
+  const getStockStatus = (stock: number) => {
+    if (stock === 0) return { text: 'Sin stock', color: 'text-red-600 bg-red-100' };
+    if (stock < 10) return { text: 'Poco stock', color: 'text-yellow-600 bg-yellow-100' };
+    return { text: 'En stock', color: 'text-green-600 bg-green-100' };
+  };
+
+  const stockStatus = getStockStatus(product.stock);
+
+  return (
+    <div className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 overflow-hidden">
+      <div className="relative">
+        {product.image ? (
+          <img
+            src={product.image}
+            alt={product.name}
+            className="w-full h-48 object-cover"
+          />
+        ) : (
+          <div className="w-full h-48 bg-gray-200 flex items-center justify-center">
+            <Package className="h-16 w-16 text-gray-400" />
+          </div>
+        )}
+        
+        <div className="absolute top-2 right-2">
+          <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${stockStatus.color}`}>
+            {stockStatus.text}
+          </span>
+        </div>
+      </div>
+      
+      <div className="p-4">
+        <div className="mb-2">
+          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary-100 text-primary-800">
+            {product.category}
+          </span>
+        </div>
+        
+        <h3 className="text-lg font-semibold text-gray-900 mb-2 line-clamp-2">
+          {product.name}
+        </h3>
+        
+        <p className="text-gray-600 text-sm mb-3 line-clamp-3">
+          {product.description}
+        </p>
+        
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center space-x-1">
+            <Star className="h-4 w-4 text-yellow-400 fill-current" />
+            <Star className="h-4 w-4 text-yellow-400 fill-current" />
+            <Star className="h-4 w-4 text-yellow-400 fill-current" />
+            <Star className="h-4 w-4 text-yellow-400 fill-current" />
+            <Star className="h-4 w-4 text-gray-300" />
+            <span className="text-sm text-gray-500 ml-1">(4.0)</span>
+          </div>
+          
+          <span className="text-sm text-gray-500">
+            Stock: {product.stock}
+          </span>
+        </div>
+        
+        <div className="flex items-center justify-between">
+          <div>
+            <span className="text-2xl font-bold text-primary-600">
+              ${product.price.toFixed(2)}
+            </span>
+          </div>
+          
+          <button
+            onClick={handleAddToCart}
+            disabled={product.stock === 0}
+            className={`flex items-center space-x-2 px-4 py-2 rounded-md font-medium transition-colors ${
+              product.stock === 0
+                ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                : 'bg-primary-600 text-white hover:bg-primary-700'
+            }`}
+          >
+            <ShoppingCart size={16} />
+            <span>{product.stock === 0 ? 'Sin stock' : 'Agregar'}</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
