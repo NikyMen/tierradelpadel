@@ -1,5 +1,5 @@
-import React from 'react';
-import { ShoppingCart, Package, Star } from 'lucide-react';
+import React, { useState } from 'react';
+import { ShoppingCart, Package, Star, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useCartStore } from '../stores/cartStore';
 import { useNotification } from '../hooks/useNotification';
 import { Notification } from './Notification';
@@ -12,6 +12,7 @@ interface ProductCardProps {
 export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
   const addItem = useCartStore((state) => state.addItem);
   const { notification, showSuccess, hideNotification } = useNotification();
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   const handleAddToCart = () => {
     addItem(product, 1);
@@ -26,13 +27,25 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
 
   const stockStatus = getStockStatus(product.stock);
 
+  // Obtener todas las imágenes disponibles
+  const allImages = [product.image, ...(product.images || [])].filter(Boolean);
+  const currentImage = allImages[currentImageIndex] || product.image;
+
+  const nextImage = () => {
+    setCurrentImageIndex((prev) => (prev + 1) % allImages.length);
+  };
+
+  const prevImage = () => {
+    setCurrentImageIndex((prev) => (prev - 1 + allImages.length) % allImages.length);
+  };
+
   return (
     <>
       <div className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 overflow-hidden">
       <div className="relative">
-        {product.image ? (
+        {currentImage ? (
           <img
-            src={product.image}
+            src={currentImage}
             alt={product.name}
             className="w-full h-48 object-cover"
           />
@@ -40,6 +53,37 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
           <div className="w-full h-48 bg-gray-200 flex items-center justify-center">
             <Package className="h-16 w-16 text-gray-400" />
           </div>
+        )}
+        
+        {/* Navegación de imágenes */}
+        {allImages.length > 1 && (
+          <>
+            <button
+              onClick={prevImage}
+              className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white rounded-full p-1 hover:bg-opacity-70 transition-opacity"
+            >
+              <ChevronLeft size={16} />
+            </button>
+            <button
+              onClick={nextImage}
+              className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white rounded-full p-1 hover:bg-opacity-70 transition-opacity"
+            >
+              <ChevronRight size={16} />
+            </button>
+            
+            {/* Indicadores de imágenes */}
+            <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 flex space-x-1">
+              {allImages.map((_, index) => (
+                <button
+                  key={index}
+                  onClick={() => setCurrentImageIndex(index)}
+                  className={`w-2 h-2 rounded-full transition-colors ${
+                    index === currentImageIndex ? 'bg-white' : 'bg-white bg-opacity-50'
+                  }`}
+                />
+              ))}
+            </div>
+          </>
         )}
         
         <div className="absolute top-2 right-2">

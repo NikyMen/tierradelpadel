@@ -60,7 +60,7 @@ export const ProductList: React.FC<ProductListProps> = ({
               <tr key={product.id} className="hover:bg-gray-50">
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div className="flex items-center">
-                    <div className="flex-shrink-0 h-12 w-12">
+                    <div className="flex-shrink-0 h-12 w-12 relative">
                       {product.image ? (
                         <img
                           className="h-12 w-12 rounded-lg object-cover"
@@ -70,6 +70,11 @@ export const ProductList: React.FC<ProductListProps> = ({
                       ) : (
                         <div className="h-12 w-12 rounded-lg bg-gray-200 flex items-center justify-center">
                           <Package className="h-6 w-6 text-gray-400" />
+                        </div>
+                      )}
+                      {product.images && product.images.length > 0 && (
+                        <div className="absolute -top-1 -right-1 bg-primary-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                          +{product.images.length}
                         </div>
                       )}
                     </div>

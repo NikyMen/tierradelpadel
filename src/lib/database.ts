@@ -8,6 +8,9 @@ dotenv.config();
 // Configurar conexión a Neon
 const sql = neon(process.env.DATABASE_URL!);
 
+// Exportar sql para uso en APIs
+export { sql };
+
 // Función para inicializar la base de datos
 export async function initDatabase() {
   try {
@@ -30,11 +33,13 @@ export async function initDatabase() {
         category VARCHAR(255) NOT NULL,
         price DECIMAL(10,2) NOT NULL,
         image TEXT,
+        images JSONB,
         stock INTEGER DEFAULT 0,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       )
     `;
+
 
     // Insertar categorías por defecto
     await sql`
@@ -43,7 +48,8 @@ export async function initDatabase() {
         ('Electrónicos', 'electronicos'),
         ('Ropa', 'ropa'),
         ('Hogar', 'hogar'),
-        ('Deportes', 'deportes')
+        ('Deportes', 'deportes'),
+        ('Vehículos', 'vehiculos')
       ON CONFLICT (slug) DO NOTHING
     `;
 
@@ -63,6 +69,7 @@ export async function initDatabase() {
       `;
     }
 
+
     console.log('Base de datos inicializada correctamente');
   } catch (error) {
     console.error('Error al inicializar la base de datos:', error);
@@ -81,6 +88,7 @@ export const db = {
         category: row.category,
         price: parseFloat(row.price),
         image: row.image,
+        images: row.images ? (typeof row.images === 'string' ? JSON.parse(row.images) : row.images) : [],
         stock: row.stock,
         createdAt: row.created_at,
         updatedAt: row.updated_at
@@ -98,6 +106,7 @@ export const db = {
         category: row.category,
         price: parseFloat(row.price),
         image: row.image,
+        images: row.images ? (typeof row.images === 'string' ? JSON.parse(row.images) : row.images) : [],
         stock: row.stock,
         createdAt: row.created_at,
         updatedAt: row.updated_at
@@ -106,8 +115,8 @@ export const db = {
     
     create: async (product: Omit<Product, 'id' | 'createdAt' | 'updatedAt'>) => {
       const rows = await sql`
-        INSERT INTO products (name, description, category, price, image, stock)
-        VALUES (${product.name}, ${product.description}, ${product.category}, ${product.price}, ${product.image}, ${product.stock})
+        INSERT INTO products (name, description, category, price, image, images, stock)
+        VALUES (${product.name}, ${product.description}, ${product.category}, ${product.price}, ${product.image}, ${JSON.stringify(product.images || [])}, ${product.stock})
         RETURNING *
       `;
       const row = rows[0];
@@ -118,6 +127,7 @@ export const db = {
         category: row.category,
         price: parseFloat(row.price),
         image: row.image,
+        images: row.images ? (typeof row.images === 'string' ? JSON.parse(row.images) : row.images) : [],
         stock: row.stock,
         createdAt: row.created_at,
         updatedAt: row.updated_at
@@ -128,7 +138,7 @@ export const db = {
       const rows = await sql`
         UPDATE products 
         SET name = ${updates.name}, description = ${updates.description}, category = ${updates.category}, 
-            price = ${updates.price}, image = ${updates.image}, stock = ${updates.stock}, updated_at = CURRENT_TIMESTAMP
+            price = ${updates.price}, image = ${updates.image}, images = ${JSON.stringify(updates.images || [])}, stock = ${updates.stock}, updated_at = CURRENT_TIMESTAMP
         WHERE id = ${id}
         RETURNING *
       `;
@@ -141,6 +151,7 @@ export const db = {
         category: row.category,
         price: parseFloat(row.price),
         image: row.image,
+        images: row.images ? (typeof row.images === 'string' ? JSON.parse(row.images) : row.images) : [],
         stock: row.stock,
         createdAt: row.created_at,
         updatedAt: row.updated_at
@@ -158,6 +169,7 @@ export const db = {
         category: row.category,
         price: parseFloat(row.price),
         image: row.image,
+        images: row.images ? (typeof row.images === 'string' ? JSON.parse(row.images) : row.images) : [],
         stock: row.stock,
         createdAt: row.created_at,
         updatedAt: row.updated_at
@@ -177,6 +189,7 @@ export const db = {
         category: row.category,
         price: parseFloat(row.price),
         image: row.image,
+        images: row.images ? (typeof row.images === 'string' ? JSON.parse(row.images) : row.images) : [],
         stock: row.stock,
         createdAt: row.created_at,
         updatedAt: row.updated_at
@@ -192,6 +205,7 @@ export const db = {
         category: row.category,
         price: parseFloat(row.price),
         image: row.image,
+        images: row.images ? (typeof row.images === 'string' ? JSON.parse(row.images) : row.images) : [],
         stock: row.stock,
         createdAt: row.created_at,
         updatedAt: row.updated_at
@@ -226,6 +240,33 @@ export const db = {
         VALUES (${category.name}, ${category.slug})
         RETURNING *
       `;
+      const row = rows[0];
+      return {
+        id: row.id.toString(),
+        name: row.name,
+        slug: row.slug
+      };
+    },
+    
+    update: async (id: string, updates: Partial<Category>) => {
+      const rows = await sql`
+        UPDATE categories 
+        SET name = ${updates.name}, slug = ${updates.slug}
+        WHERE id = ${id}
+        RETURNING *
+      `;
+      if (rows.length === 0) return null;
+      const row = rows[0];
+      return {
+        id: row.id.toString(),
+        name: row.name,
+        slug: row.slug
+      };
+    },
+    
+    delete: async (id: string) => {
+      const rows = await sql`DELETE FROM categories WHERE id = ${id} RETURNING *`;
+      if (rows.length === 0) return null;
       const row = rows[0];
       return {
         id: row.id.toString(),

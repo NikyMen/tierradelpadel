@@ -42,13 +42,6 @@ export const Header: React.FC = () => {
               >
                 Productos
               </a>
-              <a
-                href="/admin"
-                className="text-gray-700 hover:text-primary-600 transition-colors flex items-center space-x-1"
-              >
-                <Settings size={16} />
-                <span>Admin</span>
-              </a>
             </nav>
 
             {/* Cart and Mobile Menu */}

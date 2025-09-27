@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Plus, Upload, X } from 'lucide-react';
+import { Plus, Upload, X, Image as ImageIcon } from 'lucide-react';
 import type { Product } from '../../types';
 
 const productSchema = z.object({
@@ -11,7 +11,8 @@ const productSchema = z.object({
   category: z.string().min(1, 'La categoría es requerida'),
   price: z.number().min(0, 'El precio debe ser mayor a 0'),
   stock: z.number().min(0, 'El stock debe ser mayor o igual a 0'),
-  image: z.string().url('Debe ser una URL válida').optional().or(z.literal('')),
+  image: z.string().optional(),
+  images: z.array(z.string()).optional(),
 });
 
 type ProductFormData = z.infer<typeof productSchema>;
@@ -30,6 +31,9 @@ export const ProductForm: React.FC<ProductFormProps> = ({
   categories
 }) => {
   const [imagePreview, setImagePreview] = useState(product?.image || '');
+  const [additionalImages, setAdditionalImages] = useState<string[]>(product?.images || []);
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   
   const {
     register,
@@ -46,6 +50,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({
       price: product?.price || 0,
       stock: product?.stock || 0,
       image: product?.image || '',
+      images: product?.images || [],
     }
   });
 
@@ -57,8 +62,65 @@ export const ProductForm: React.FC<ProductFormProps> = ({
     }
   }, [watchedImage]);
 
+  const handleFileUpload = async (files: FileList) => {
+    if (files.length === 0) return;
+    
+    setUploading(true);
+    try {
+      const formData = new FormData();
+      Array.from(files).forEach(file => {
+        formData.append('images', file);
+      });
+
+      const response = await fetch('/api/upload', {
+        method: 'POST',
+        body: formData,
+      });
+
+      const result = await response.json();
+      
+      if (response.ok) {
+        const newImages = [...additionalImages, ...result.files];
+        if (newImages.length > 4) {
+          alert('Máximo 4 imágenes permitidas');
+          return;
+        }
+        setAdditionalImages(newImages);
+        setValue('images', newImages);
+        
+        // Si no hay imagen principal, usar la primera como principal
+        if (!imagePreview && result.files.length > 0) {
+          setImagePreview(result.files[0]);
+          setValue('image', result.files[0]);
+        }
+      } else {
+        alert(result.error || 'Error al subir imágenes');
+      }
+    } catch (error) {
+      console.error('Error uploading files:', error);
+      alert('Error al subir imágenes');
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const removeImage = (index: number) => {
+    const newImages = additionalImages.filter((_, i) => i !== index);
+    setAdditionalImages(newImages);
+    setValue('images', newImages);
+  };
+
+  const setMainImage = (imageUrl: string) => {
+    setImagePreview(imageUrl);
+    setValue('image', imageUrl);
+  };
+
   const handleFormSubmit = (data: ProductFormData) => {
-    onSubmit(data);
+    const submitData = {
+      ...data,
+      images: additionalImages
+    };
+    onSubmit(submitData);
   };
 
   return (
@@ -165,30 +227,110 @@ export const ProductForm: React.FC<ProductFormProps> = ({
               </div>
             </div>
 
+            {/* Sección de imágenes */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                URL de la Imagen
+                Imágenes del Producto (máximo 4)
               </label>
-              <input
-                {...register('image')}
-                type="url"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
-                placeholder="https://ejemplo.com/imagen.jpg"
-              />
-              {errors.image && (
-                <p className="text-red-500 text-sm mt-1">{errors.image.message}</p>
-              )}
               
+              {/* Subida de archivos */}
+              <div className="mb-4">
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  multiple
+                  accept="image/*"
+                  onChange={(e) => e.target.files && handleFileUpload(e.target.files)}
+                  className="hidden"
+                />
+                <button
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={uploading || additionalImages.length >= 4}
+                  className="flex items-center space-x-2 px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <Upload size={16} />
+                  <span>{uploading ? 'Subiendo...' : 'Subir Imágenes'}</span>
+                </button>
+                <p className="text-sm text-gray-500 mt-1">
+                  {additionalImages.length}/4 imágenes. Máximo 5MB por imagen.
+                </p>
+              </div>
+
+              {/* Imagen principal */}
               {imagePreview && (
-                <div className="mt-4">
-                  <img
-                    src={imagePreview}
-                    alt="Vista previa"
-                    className="w-32 h-32 object-cover rounded-md border"
-                    onError={() => setImagePreview('')}
-                  />
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Imagen Principal
+                  </label>
+                  <div className="relative inline-block">
+                    <img
+                      src={imagePreview}
+                      alt="Imagen principal"
+                      className="w-32 h-32 object-cover rounded-md border"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setImagePreview('');
+                        setValue('image', '');
+                      }}
+                      className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center hover:bg-red-600"
+                    >
+                      <X size={12} />
+                    </button>
+                  </div>
                 </div>
               )}
+
+              {/* Imágenes adicionales */}
+              {additionalImages.length > 0 && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Imágenes Adicionales
+                  </label>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    {additionalImages.map((image, index) => (
+                      <div key={index} className="relative">
+                        <img
+                          src={image}
+                          alt={`Imagen ${index + 1}`}
+                          className="w-full h-24 object-cover rounded-md border cursor-pointer hover:opacity-80"
+                          onClick={() => setMainImage(image)}
+                        />
+                        <button
+                          type="button"
+                          onClick={() => removeImage(index)}
+                          className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center hover:bg-red-600"
+                        >
+                          <X size={12} />
+                        </button>
+                        {image === imagePreview && (
+                          <div className="absolute bottom-1 left-1 bg-primary-600 text-white text-xs px-1 rounded">
+                            Principal
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* URL de imagen externa */}
+              <div className="mt-4">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  O URL de Imagen Externa
+                </label>
+                <input
+                  {...register('image')}
+                  type="url"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
+                  placeholder="https://ejemplo.com/imagen.jpg"
+                />
+                {errors.image && (
+                  <p className="text-red-500 text-sm mt-1">{errors.image.message}</p>
+                )}
+              </div>
             </div>
 
             <div className="flex justify-end space-x-4 pt-6">
