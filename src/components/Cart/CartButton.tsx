@@ -7,8 +7,8 @@ interface CartButtonProps {
 }
 
 export const CartButton: React.FC<CartButtonProps> = ({ onClick }) => {
-  const getTotalItems = useCartStore((state) => state.getTotalItems);
-  const totalItems = getTotalItems();
+  const items = useCartStore((state) => state.items);
+  const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
 
   return (
     <button

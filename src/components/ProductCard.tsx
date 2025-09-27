@@ -1,6 +1,8 @@
 import React from 'react';
 import { ShoppingCart, Package, Star } from 'lucide-react';
 import { useCartStore } from '../stores/cartStore';
+import { useNotification } from '../hooks/useNotification';
+import { Notification } from './Notification';
 import type { Product } from '../types';
 
 interface ProductCardProps {
@@ -9,9 +11,11 @@ interface ProductCardProps {
 
 export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
   const addItem = useCartStore((state) => state.addItem);
+  const { notification, showSuccess, hideNotification } = useNotification();
 
   const handleAddToCart = () => {
     addItem(product, 1);
+    showSuccess(`${product.name} se añadió correctamente al carrito`);
   };
 
   const getStockStatus = (stock: number) => {
@@ -23,7 +27,8 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
   const stockStatus = getStockStatus(product.stock);
 
   return (
-    <div className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 overflow-hidden">
+    <>
+      <div className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 overflow-hidden">
       <div className="relative">
         {product.image ? (
           <img
@@ -96,5 +101,13 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
         </div>
       </div>
     </div>
+    
+    <Notification
+      message={notification.message}
+      type={notification.type}
+      isVisible={notification.isVisible}
+      onClose={hideNotification}
+    />
+    </>
   );
 };

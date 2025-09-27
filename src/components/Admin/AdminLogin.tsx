@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Lock, User, Eye, EyeOff } from 'lucide-react';
 
 interface AdminLoginProps {
-  onLogin: (username: string, password: string) => boolean;
+  onLogin: (username: string, password: string) => Promise<boolean>;
 }
 
 export const AdminLogin: React.FC<AdminLoginProps> = ({ onLogin }) => {
@@ -10,19 +10,28 @@ export const AdminLogin: React.FC<AdminLoginProps> = ({ onLogin }) => {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+    setLoading(true);
     
     if (!username || !password) {
       setError('Por favor, completa todos los campos');
+      setLoading(false);
       return;
     }
 
-    const success = onLogin(username, password);
-    if (!success) {
-      setError('Credenciales incorrectas');
+    try {
+      const success = await onLogin(username, password);
+      if (!success) {
+        setError('Credenciales incorrectas');
+      }
+    } catch (error) {
+      setError('Error al conectar con el servidor');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -106,15 +115,23 @@ export const AdminLogin: React.FC<AdminLoginProps> = ({ onLogin }) => {
           <div>
             <button
               type="submit"
-              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
+              disabled={loading}
+              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Iniciar Sesión
+              {loading ? (
+                <div className="flex items-center">
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                  Iniciando sesión...
+                </div>
+              ) : (
+                'Iniciar Sesión'
+              )}
             </button>
           </div>
           
           <div className="text-center">
             <p className="text-xs text-gray-500">
-              Credenciales de prueba: <strong>admin</strong> / <strong>admin123</strong>
+              Las credenciales se configuran en las variables de entorno
             </p>
           </div>
         </form>

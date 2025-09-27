@@ -1,6 +1,10 @@
 import { neon } from '@neondatabase/serverless';
 import type { Product, Category } from '../types';
 
+// Cargar variables de entorno
+import dotenv from 'dotenv';
+dotenv.config();
+
 // Configurar conexión a Neon
 const sql = neon(process.env.DATABASE_URL!);
 

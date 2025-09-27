@@ -139,14 +139,28 @@ export const AdminPanel: React.FC = () => {
     setViewingProduct(null);
   };
 
-  const handleLogin = (username: string, password: string): boolean => {
-    // Credenciales simples para demo (en producción usarías autenticación real)
-    if (username === 'admin' && password === 'admin123') {
-      setIsAuthenticated(true);
-      localStorage.setItem('admin_authenticated', 'true');
-      return true;
+  const handleLogin = async (username: string, password: string): Promise<boolean> => {
+    try {
+      const response = await fetch('/api/admin-login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ username, password }),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        setIsAuthenticated(true);
+        localStorage.setItem('admin_authenticated', 'true');
+        return true;
+      }
+      return false;
+    } catch (error) {
+      console.error('Error al autenticar:', error);
+      return false;
     }
-    return false;
   };
 
   const handleLogout = () => {

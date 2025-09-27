@@ -10,7 +10,8 @@ interface CartSidebarProps {
 }
 
 export const CartSidebar: React.FC<CartSidebarProps> = ({ isOpen, onClose }) => {
-  const { items, total, clearCart, getTotalItems } = useCartStore();
+  const { items, total, clearCart } = useCartStore();
+  const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
   const [showWhatsAppForm, setShowWhatsAppForm] = useState(false);
   const [customerInfo, setCustomerInfo] = useState({
     name: '',
@@ -82,7 +83,7 @@ export const CartSidebar: React.FC<CartSidebarProps> = ({ isOpen, onClose }) => 
             <div className="flex items-center space-x-2">
               <ShoppingCart className="h-6 w-6 text-primary-600" />
               <h2 className="text-lg font-semibold text-gray-900">
-                Carrito ({getTotalItems()})
+                Carrito ({totalItems})
               </h2>
             </div>
             <button
