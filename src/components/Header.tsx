@@ -23,8 +23,11 @@ export const Header: React.FC = () => {
             {/* Logo */}
             <div className="flex items-center">
               <a href="/" className="flex items-center space-x-2">
-                <Package className="h-8 w-8 text-primary-600" />
-                <span className="text-xl font-bold text-gray-900">LC Imports</span>
+                <img 
+                  src="/logo-lcimports.svg" 
+                  alt="LC Imports Logo" 
+                  className="h-10 w-auto"
+                />
               </a>
             </div>
 
@@ -48,43 +51,49 @@ export const Header: React.FC = () => {
             <div className="flex items-center space-x-4">
               <CartButton onClick={toggleCart} />
               
+              
+
               {/* Mobile menu button */}
               <button
                 onClick={toggleMobileMenu}
-                className="md:hidden p-2 text-gray-600 hover:text-primary-600 transition-colors"
+                className="md:hidden p-2 rounded-md text-gray-700 hover:text-primary-600 hover:bg-gray-100"
               >
-                {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+                {isMobileMenuOpen ? (
+                  <X className="h-6 w-6" />
+                ) : (
+                  <Menu className="h-6 w-6" />
+                )}
               </button>
             </div>
           </div>
 
           {/* Mobile Navigation */}
           {isMobileMenuOpen && (
-            <div className="md:hidden border-t border-gray-200 py-4">
-              <nav className="flex flex-col space-y-4">
+            <div className="md:hidden">
+              <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 border-t border-gray-200">
                 <a
                   href="/"
-                  className="text-gray-700 hover:text-primary-600 transition-colors"
+                  className="block px-3 py-2 text-gray-700 hover:text-primary-600 transition-colors"
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
                   Inicio
                 </a>
                 <a
                   href="/#productos"
-                  className="text-gray-700 hover:text-primary-600 transition-colors"
+                  className="block px-3 py-2 text-gray-700 hover:text-primary-600 transition-colors"
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
                   Productos
                 </a>
                 <a
                   href="/admin"
-                  className="text-gray-700 hover:text-primary-600 transition-colors flex items-center space-x-2"
+                  className="flex items-center px-3 py-2 text-gray-700 hover:text-primary-600 transition-colors"
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
-                  <Settings size={16} />
-                  <span>Panel de Administración</span>
+                  <Settings className="h-5 w-5 mr-2" />
+                  Admin
                 </a>
-              </nav>
+              </div>
             </div>
           )}
         </div>
