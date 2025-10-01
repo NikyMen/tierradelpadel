@@ -55,7 +55,9 @@ export const PUT: APIRoute = async ({ params, request }) => {
     }
     
     const updates = await request.json();
-    const updatedProduct = db.products.update(id, updates);
+    console.log('API recibió updates:', updates);
+    
+    const updatedProduct = await db.products.update(id, updates);
     
     if (!updatedProduct) {
       return new Response(JSON.stringify({ error: 'Producto no encontrado' }), {
@@ -66,6 +68,8 @@ export const PUT: APIRoute = async ({ params, request }) => {
       });
     }
     
+    console.log('API devuelve producto actualizado:', updatedProduct);
+    
     return new Response(JSON.stringify(updatedProduct), {
       status: 200,
       headers: {
@@ -73,7 +77,8 @@ export const PUT: APIRoute = async ({ params, request }) => {
       },
     });
   } catch (error) {
-    return new Response(JSON.stringify({ error: 'Error al actualizar producto' }), {
+    console.error('Error en API PUT:', error);
+    return new Response(JSON.stringify({ error: 'Error al actualizar producto: ' + error.message }), {
       status: 500,
       headers: {
         'Content-Type': 'application/json',

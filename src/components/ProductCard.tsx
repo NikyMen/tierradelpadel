@@ -19,14 +19,6 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
     showSuccess(`${product.name} se añadió correctamente al carrito`);
   };
 
-  const getStockStatus = (stock: number) => {
-    if (stock === 0) return { text: 'Sin stock', color: 'text-red-600 bg-red-100' };
-    if (stock < 10) return { text: 'Poco stock', color: 'text-yellow-600 bg-yellow-100' };
-    return { text: 'En stock', color: 'text-green-600 bg-green-100' };
-  };
-
-  const stockStatus = getStockStatus(product.stock);
-
   // Obtener todas las imágenes disponibles
   const allImages = [product.image, ...(product.images || [])].filter(Boolean);
   const currentImage = allImages[currentImageIndex] || product.image;
@@ -85,12 +77,6 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
             </div>
           </>
         )}
-        
-        <div className="absolute top-2 right-2">
-          <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${stockStatus.color}`}>
-            {stockStatus.text}
-          </span>
-        </div>
       </div>
       
       <div className="p-4">
@@ -117,10 +103,6 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
             <Star className="h-4 w-4 text-gray-300" />
             <span className="text-sm text-gray-500 ml-1">(4.0)</span>
           </div>
-          
-          <span className="text-sm text-gray-500">
-            Stock: {product.stock}
-          </span>
         </div>
         
         <div className="flex items-center justify-between">
@@ -132,15 +114,10 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
           
           <button
             onClick={handleAddToCart}
-            disabled={product.stock === 0}
-            className={`flex items-center space-x-2 px-4 py-2 rounded-md font-medium transition-colors ${
-              product.stock === 0
-                ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                : 'bg-primary-600 text-white hover:bg-primary-700'
-            }`}
+            className="flex items-center space-x-2 px-4 py-2 rounded-md font-medium transition-colors bg-primary-600 text-white hover:bg-primary-700"
           >
             <ShoppingCart size={16} />
-            <span>{product.stock === 0 ? 'Sin stock' : 'Agregar'}</span>
+            <span>Agregar</span>
           </button>
         </div>
       </div>

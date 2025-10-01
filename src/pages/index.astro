@@ -2,12 +2,16 @@
 import Layout from '../layouts/Layout.astro';
 import { Header } from '../components/Header';
 import { Hero } from '../components/Hero';
+import { FeaturedProducts } from '../components/FeaturedProducts';
+import { Features } from '../components/Features';
 import { ProductGrid } from '../components/ProductGrid';
 ---
 
 <Layout title="LC Imports - Tu tienda online de confianza">
   <Header client:load />
   <Hero client:load />
+  <FeaturedProducts client:load />
+  <Features client:load />
   <main>
     <section id="productos">
       <ProductGrid client:load />

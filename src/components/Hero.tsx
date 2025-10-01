@@ -1,10 +1,10 @@
 import React from 'react';
-import { ShoppingBag, Truck, Shield, Star } from 'lucide-react';
+import { ShoppingBag } from 'lucide-react';
 
 export const Hero: React.FC = () => {
   return (
     <div 
-      className="relative text-white min-h-[608px] flex items-center"
+      className="relative text-white min-h-[600px] flex items-center"
       style={{
         backgroundImage: 'url(/backgroundLcimports.webp)',
         backgroundSize: 'cover',
@@ -31,52 +31,6 @@ export const Hero: React.FC = () => {
               <ShoppingBag size={20} />
               <span>Ver Productos</span>
             </a>
-          </div>
-        </div>
-      </div>
-
-      {/* Features */}
-      <div className="relative py-12">
-        {/* Fondo semitransparente con bordes */}
-        <div className="absolute inset-0 bg-white bg-opacity-20 backdrop-blur-sm border-t border-white border-opacity-30"></div>
-        
-        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="text-center">
-              <div className="bg-white bg-opacity-20 backdrop-blur-sm rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4 border border-white border-opacity-30">
-                <Truck className="h-8 w-8 text-white" />
-              </div>
-              <h3 className="text-lg font-semibold text-white mb-2 drop-shadow-md">
-                Envío Rápido
-              </h3>
-              <p className="text-white text-opacity-90 drop-shadow-sm">
-                Recibe tus productos en tiempo récord con nuestro servicio de envío express
-              </p>
-            </div>
-
-            <div className="text-center">
-              <div className="bg-white bg-opacity-20 backdrop-blur-sm rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4 border border-white border-opacity-30">
-                <Shield className="h-8 w-8 text-white" />
-              </div>
-              <h3 className="text-lg font-semibold text-white mb-2 drop-shadow-md">
-                Productos Garantizados
-              </h3>
-              <p className="text-white text-opacity-90 drop-shadow-sm">
-                Todos nuestros productos cuentan con garantía de calidad y satisfacción
-              </p>
-            </div>
-
-            <div className="text-center">
-              <div className="bg-white bg-opacity-20 backdrop-blur-sm rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4 border border-white border-opacity-30">
-                <Star className="h-8 w-8 text-white" />
-              </div>
-              <h3 className="text-lg font-semibold text-white mb-2 drop-shadow-md">
-                Atención Premium
-              </h3>
-              <p className="text-white text-opacity-90 drop-shadow-sm">
-                Nuestro equipo está disponible para brindarte la mejor experiencia de compra
-              </p>
-            </div>
           </div>
         </div>
       </div>

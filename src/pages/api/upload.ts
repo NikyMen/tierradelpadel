@@ -6,7 +6,19 @@ import { existsSync } from 'fs';
 export const POST: APIRoute = async ({ request }) => {
   try {
     const formData = await request.formData();
-    const files = formData.getAll('images') as File[];
+    
+    // Intentar obtener archivos de diferentes campos
+    let files: File[] = [];
+    
+    // Para archivo individual (campo 'file')
+    const singleFile = formData.get('file') as File;
+    if (singleFile && singleFile.size > 0) {
+      files = [singleFile];
+    } else {
+      // Para múltiples archivos (campo 'images')
+      const multipleFiles = formData.getAll('images') as File[];
+      files = multipleFiles.filter(file => file && file.size > 0);
+    }
     
     if (!files || files.length === 0) {
       return new Response(JSON.stringify({ error: 'No se proporcionaron archivos' }), {
@@ -71,11 +83,19 @@ export const POST: APIRoute = async ({ request }) => {
       uploadedFiles.push(`/uploads/${fileName}`);
     }
 
-    return new Response(JSON.stringify({ 
-      success: true, 
+    // Para compatibilidad con código que espera un solo archivo
+    const response = files.length === 1 ? {
+      success: true,
+      url: uploadedFiles[0], // Para archivo individual
       files: uploadedFiles,
       message: `${uploadedFiles.length} imagen(es) subida(s) correctamente`
-    }), {
+    } : {
+      success: true,
+      files: uploadedFiles,
+      message: `${uploadedFiles.length} imagen(es) subida(s) correctamente`
+    };
+
+    return new Response(JSON.stringify(response), {
       status: 200,
       headers: {
         'Content-Type': 'application/json',
