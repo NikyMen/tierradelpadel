@@ -77,14 +77,51 @@ export const ProductForm: React.FC<ProductFormProps> = ({
       return;
     }
 
-    if (file.size > 15 * 1024 * 1024) {
-      alert('El archivo es demasiado grande. Máximo 15MB permitido');
-      return;
-    }
+    // Convertir a WebP antes de subir (obligatorio)
+    const convertToWebP = async (inputFile: File, quality = 0.8): Promise<File> => {
+      return new Promise((resolve, reject) => {
+        const url = URL.createObjectURL(inputFile);
+        const img = new Image();
+        img.onload = () => {
+          try {
+            const canvas = document.createElement('canvas');
+            canvas.width = img.naturalWidth;
+            canvas.height = img.naturalHeight;
+            const ctx = canvas.getContext('2d');
+            if (!ctx) {
+              URL.revokeObjectURL(url);
+              return reject(new Error('No se pudo inicializar el contexto del canvas'));
+            }
+            ctx.drawImage(img, 0, 0);
+            canvas.toBlob((blob) => {
+              URL.revokeObjectURL(url);
+              if (!blob) {
+                return reject(new Error('No se pudo convertir la imagen a WebP'));
+              }
+              const baseName = inputFile.name.replace(/\.[^/.]+$/, '');
+              const webpFile = new File([blob], `${baseName}.webp`, { type: 'image/webp' });
+              if (webpFile.size > 15 * 1024 * 1024) {
+                return reject(new Error('La imagen convertida supera 15MB'));
+              }
+              resolve(webpFile);
+            }, 'image/webp', quality);
+          } catch (e) {
+            URL.revokeObjectURL(url);
+            reject(e);
+          }
+        };
+        img.onerror = () => {
+          URL.revokeObjectURL(url);
+          reject(new Error('No se pudo cargar la imagen para convertir'));
+        };
+        img.src = url;
+      });
+    };
 
     setUploading(true);
     try {
-      const imageUrl = await uploadImage(file);
+      const webpFile = await convertToWebP(file, 0.8);
+      const imageUrl = await uploadImage(webpFile);
       setImagePreview(imageUrl);
       setValue('image', imageUrl);
     } catch (error) {
@@ -109,10 +146,46 @@ export const ProductForm: React.FC<ProductFormProps> = ({
       return;
     }
 
-    if (file.size > 15 * 1024 * 1024) {
-      alert('El archivo es demasiado grande. Máximo 15MB permitido');
-      return;
-    }
+    // Convertir a WebP antes de subir (obligatorio)
+    const convertToWebP = async (inputFile: File, quality = 0.8): Promise<File> => {
+      return new Promise((resolve, reject) => {
+        const url = URL.createObjectURL(inputFile);
+        const img = new Image();
+        img.onload = () => {
+          try {
+            const canvas = document.createElement('canvas');
+            canvas.width = img.naturalWidth;
+            canvas.height = img.naturalHeight;
+            const ctx = canvas.getContext('2d');
+            if (!ctx) {
+              URL.revokeObjectURL(url);
+              return reject(new Error('No se pudo inicializar el contexto del canvas'));
+            }
+            ctx.drawImage(img, 0, 0);
+            canvas.toBlob((blob) => {
+              URL.revokeObjectURL(url);
+              if (!blob) {
+                return reject(new Error('No se pudo convertir la imagen a WebP'));
+              }
+              const baseName = inputFile.name.replace(/\.[^/.]+$/, '');
+              const webpFile = new File([blob], `${baseName}.webp`, { type: 'image/webp' });
+              if (webpFile.size > 15 * 1024 * 1024) {
+                return reject(new Error('La imagen convertida supera 15MB'));
+              }
+              resolve(webpFile);
+            }, 'image/webp', quality);
+          } catch (e) {
+            URL.revokeObjectURL(url);
+            reject(e);
+          }
+        };
+        img.onerror = () => {
+          URL.revokeObjectURL(url);
+          reject(new Error('No se pudo cargar la imagen para convertir'));
+        };
+        img.src = url;
+      });
+    };
 
     if (additionalImages.length >= 4) {
       alert('Máximo 4 imágenes adicionales permitidas');
@@ -121,7 +194,8 @@ export const ProductForm: React.FC<ProductFormProps> = ({
 
     setUploading(true);
     try {
-      const imageUrl = await uploadImage(file);
+      const webpFile = await convertToWebP(file, 0.8);
+      const imageUrl = await uploadImage(webpFile);
       const newImages = [...additionalImages, imageUrl];
       setAdditionalImages(newImages);
       setValue('images', newImages);

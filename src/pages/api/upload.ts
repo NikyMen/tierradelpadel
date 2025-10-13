@@ -2,7 +2,7 @@ import type { APIRoute } from 'astro';
 import { writeFile, mkdir } from 'fs/promises';
 import { join } from 'path';
 import { existsSync } from 'fs';
-import sharp from 'sharp';
+// Eliminamos dependencias nativas para evitar errores en Vercel
 
 export const POST: APIRoute = async ({ request }) => {
   try {
@@ -70,6 +70,16 @@ export const POST: APIRoute = async ({ request }) => {
         });
       }
 
+      // Conversión obligatoria: exigir WebP en servidor para evitar binarios nativos
+      if (file.type.toLowerCase() !== 'image/webp') {
+        return new Response(JSON.stringify({ error: 'La imagen debe estar en formato WebP' }), {
+          status: 400,
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+      }
+
       // Generar nombre único para el archivo (siempre .webp)
       const timestamp = Date.now();
       const randomString = Math.random().toString(36).substring(2, 15);
@@ -77,23 +87,8 @@ export const POST: APIRoute = async ({ request }) => {
 
       const filePath = join(uploadDir, fileName);
       const arrayBuffer = await file.arrayBuffer();
-      const inputBuffer = Buffer.from(arrayBuffer);
-
-      // Conversión obligatoria a WebP
-      // Nota: para GIFs/formatos no compatibles, sharp convertirá la primera imagen disponible.
-      // En caso de error de conversión, devolver respuesta clara.
-      try {
-        const webpBuffer = await sharp(inputBuffer).webp({ quality: 80 }).toBuffer();
-        await writeFile(filePath, webpBuffer);
-      } catch (err) {
-        console.error('Error convirtiendo a WebP:', err);
-        return new Response(JSON.stringify({ error: 'No se pudo convertir la imagen a WebP' }), {
-          status: 400,
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        });
-      }
+      const buffer = Buffer.from(arrayBuffer);
+      await writeFile(filePath, buffer);
 
       const publicUrl = isVercel ? `/api/uploads/${fileName}` : `/uploads/${fileName}`;
       uploadedFiles.push(publicUrl);
