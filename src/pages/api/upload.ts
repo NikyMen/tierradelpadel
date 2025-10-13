@@ -2,6 +2,7 @@ import type { APIRoute } from 'astro';
 import { writeFile, mkdir } from 'fs/promises';
 import { join } from 'path';
 import { existsSync } from 'fs';
+import sharp from 'sharp';
 
 export const POST: APIRoute = async ({ request }) => {
   try {
@@ -59,9 +60,9 @@ export const POST: APIRoute = async ({ request }) => {
         });
       }
 
-      // Validar tamaño (máximo 5MB)
-      if (file.size > 5 * 1024 * 1024) {
-        return new Response(JSON.stringify({ error: 'El archivo es demasiado grande. Máximo 5MB' }), {
+      // Validar tamaño (máximo 15MB)
+      if (file.size > 15 * 1024 * 1024) {
+        return new Response(JSON.stringify({ error: 'El archivo es demasiado grande. Máximo 15MB' }), {
           status: 400,
           headers: {
             'Content-Type': 'application/json',
@@ -69,17 +70,31 @@ export const POST: APIRoute = async ({ request }) => {
         });
       }
 
-      // Generar nombre único para el archivo
+      // Generar nombre único para el archivo (siempre .webp)
       const timestamp = Date.now();
       const randomString = Math.random().toString(36).substring(2, 15);
-      const extension = file.name.split('.').pop();
-      const fileName = `product_${timestamp}_${randomString}.${extension}`;
-      
+      const fileName = `product_${timestamp}_${randomString}.webp`;
+
       const filePath = join(uploadDir, fileName);
       const arrayBuffer = await file.arrayBuffer();
-      const buffer = Buffer.from(arrayBuffer);
-      await writeFile(filePath, buffer);
-      
+      const inputBuffer = Buffer.from(arrayBuffer);
+
+      // Conversión obligatoria a WebP
+      // Nota: para GIFs/formatos no compatibles, sharp convertirá la primera imagen disponible.
+      // En caso de error de conversión, devolver respuesta clara.
+      try {
+        const webpBuffer = await sharp(inputBuffer).webp({ quality: 80 }).toBuffer();
+        await writeFile(filePath, webpBuffer);
+      } catch (err) {
+        console.error('Error convirtiendo a WebP:', err);
+        return new Response(JSON.stringify({ error: 'No se pudo convertir la imagen a WebP' }), {
+          status: 400,
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+      }
+
       const publicUrl = isVercel ? `/api/uploads/${fileName}` : `/uploads/${fileName}`;
       uploadedFiles.push(publicUrl);
     }

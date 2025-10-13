@@ -77,8 +77,8 @@ export const ProductForm: React.FC<ProductFormProps> = ({
       return;
     }
 
-    if (file.size > 5 * 1024 * 1024) {
-      alert('El archivo es demasiado grande. Máximo 5MB permitido');
+    if (file.size > 15 * 1024 * 1024) {
+      alert('El archivo es demasiado grande. Máximo 15MB permitido');
       return;
     }
 
@@ -109,8 +109,8 @@ export const ProductForm: React.FC<ProductFormProps> = ({
       return;
     }
 
-    if (file.size > 5 * 1024 * 1024) {
-      alert('El archivo es demasiado grande. Máximo 5MB permitido');
+    if (file.size > 15 * 1024 * 1024) {
+      alert('El archivo es demasiado grande. Máximo 15MB permitido');
       return;
     }
 
