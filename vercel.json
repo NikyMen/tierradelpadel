@@ -2,11 +2,7 @@
   "version": 2,
   "installCommand": "npm ci",
   "buildCommand": "astro build",
-  "functions": {
-    "api/**": {
-      "runtime": "nodejs20.x"
-    }
-  },
+  
   "regions": ["iad1"],
   "rewrites": [
     { "source": "/uploads/(.*)", "destination": "/api/uploads/$1" }
