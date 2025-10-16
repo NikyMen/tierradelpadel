@@ -3,7 +3,9 @@
   "installCommand": "npm ci",
   "buildCommand": "astro build",
   "functions": {
-    "runtime": "nodejs20.x"
+    "api/**": {
+      "runtime": "nodejs20.x"
+    }
   },
   "regions": ["iad1"],
   "rewrites": [
