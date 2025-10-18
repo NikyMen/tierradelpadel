@@ -53,9 +53,9 @@ export const POST: APIRoute = async ({ request }) => {
         });
       }
 
-      // Validar tamaño (máximo 15MB)
-      if (file.size > 15 * 1024 * 1024) {
-        return new Response(JSON.stringify({ error: 'El archivo es demasiado grande. Máximo 15MB' }), {
+      // Validar tamaño (máximo 50MB)
+      if (file.size > 50 * 1024 * 1024) {
+        return new Response(JSON.stringify({ error: 'El archivo es demasiado grande. Máximo 50MB' }), {
           status: 400,
           headers: {
             'Content-Type': 'application/json',

@@ -100,9 +100,11 @@ export const ProductForm: React.FC<ProductFormProps> = ({
               }
               const baseName = inputFile.name.replace(/\.[^/.]+$/, '');
               const webpFile = new File([blob], `${baseName}.webp`, { type: 'image/webp' });
-              if (webpFile.size > 15 * 1024 * 1024) {
-                return reject(new Error('La imagen convertida supera 15MB'));
-              }
+-              if (webpFile.size > 15 * 1024 * 1024) {
+-                return reject(new Error('La imagen convertida supera 15MB'));
++              if (webpFile.size > 50 * 1024 * 1024) {
++                return reject(new Error('La imagen convertida supera 50MB'));
+               }
               resolve(webpFile);
             }, 'image/webp', quality);
           } catch (e) {
@@ -169,9 +171,11 @@ export const ProductForm: React.FC<ProductFormProps> = ({
               }
               const baseName = inputFile.name.replace(/\.[^/.]+$/, '');
               const webpFile = new File([blob], `${baseName}.webp`, { type: 'image/webp' });
-              if (webpFile.size > 15 * 1024 * 1024) {
-                return reject(new Error('La imagen convertida supera 15MB'));
-              }
+-              if (webpFile.size > 15 * 1024 * 1024) {
+-                return reject(new Error('La imagen convertida supera 15MB'));
++              if (webpFile.size > 50 * 1024 * 1024) {
++                return reject(new Error('La imagen convertida supera 50MB'));
+               }
               resolve(webpFile);
             }, 'image/webp', quality);
           } catch (e) {
