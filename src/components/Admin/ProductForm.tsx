@@ -98,8 +98,10 @@ export const ProductForm: React.FC<ProductFormProps> = ({
               if (!blob) {
                 return reject(new Error('No se pudo convertir la imagen a WebP'));
               }
-              const baseName = inputFile.name.replace(/\.[^/.]+$/, '');
-              const webpFile = new File([blob], `${baseName}.webp`, { type: 'image/webp' });
+              // Asegurar nombre de archivo válido
+              const originalBaseName = inputFile.name.replace(/\.[^/.]+$/, '');
+              const safeBaseName = originalBaseName.replace(/[^a-zA-Z0-9_.-]/g, '_') || 'image';
+              const webpFile = new File([blob], `${safeBaseName}.webp`, { type: 'image/webp' });
               if (webpFile.size > 50 * 1024 * 1024) {
                 return reject(new Error('La imagen convertida supera 50MB'));
               }
@@ -167,8 +169,10 @@ export const ProductForm: React.FC<ProductFormProps> = ({
               if (!blob) {
                 return reject(new Error('No se pudo convertir la imagen a WebP'));
               }
-              const baseName = inputFile.name.replace(/\.[^/.]+$/, '');
-              const webpFile = new File([blob], `${baseName}.webp`, { type: 'image/webp' });
+              // Asegurar nombre de archivo válido
+              const originalBaseName = inputFile.name.replace(/\.[^/.]+$/, '');
+              const safeBaseName = originalBaseName.replace(/[^a-zA-Z0-9_.-]/g, '_') || 'image';
+              const webpFile = new File([blob], `${safeBaseName}.webp`, { type: 'image/webp' });
               if (webpFile.size > 50 * 1024 * 1024) {
                 return reject(new Error('La imagen convertida supera 50MB'));
               }
