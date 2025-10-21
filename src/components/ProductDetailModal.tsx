@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { X, ShoppingCart, ZoomIn, ZoomOut, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useCartStore } from '../stores/cartStore';
 import { useNotification } from '../hooks/useNotification';
+import { formatPriceARS } from '../lib/formatters';
 import type { Product } from '../types';
 
 interface ProductDetailModalProps {
@@ -72,21 +73,21 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
             {/* Image section */}
             <div className="w-full md:w-1/2 relative bg-gray-100">
               <div 
-                className={`relative overflow-hidden ${isZoomed ? 'cursor-zoom-out' : 'cursor-zoom-in'}`}
+                className={`relative overflow-hidden ${isZoomed ? 'cursor-zoom-out' : 'cursor-zoom-in'} aspect-square`}
                 onClick={toggleZoom}
               >
                 {currentImage ? (
                   <img
                     src={currentImage}
                     alt={product.name}
-                    className={`w-full object-contain transition-transform duration-300 ${
+                    className={`w-full h-full object-contain transition-transform duration-300 ${
                       isZoomed 
-                        ? 'scale-150 h-[60vh] md:h-[80vh]' 
-                        : 'h-[40vh] md:h-[60vh]'
+                        ? 'scale-150' 
+                        : 'scale-100'
                     }`}
                   />
                 ) : (
-                  <div className="w-full h-[40vh] md:h-[60vh] flex items-center justify-center">
+                  <div className="w-full h-full flex items-center justify-center">
                     <span className="text-gray-400">No hay imagen disponible</span>
                   </div>
                 )}
@@ -160,7 +161,7 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
               
               <div className="mb-6">
                 <span className="text-3xl font-bold text-primary-600">
-                  ${product.price.toFixed(2)}
+                  {formatPriceARS(product.price)}
                 </span>
               </div>
               

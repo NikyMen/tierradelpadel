@@ -4,6 +4,7 @@ import { useCartStore } from '../stores/cartStore';
 import { useNotification } from '../hooks/useNotification';
 import { Notification } from './Notification';
 import { ProductDetailModal } from './ProductDetailModal';
+import { formatPriceARS } from '../lib/formatters';
 import type { Product } from '../types';
 
 interface ProductCardProps {
@@ -51,17 +52,19 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
         onClick={openModal}
       >
         <div className="relative">
-          {currentImage ? (
-            <img
-              src={currentImage}
-              alt={product.name}
-              className="w-full h-40 md:h-44 object-cover"
-            />
-          ) : (
-            <div className="w-full h-40 md:h-44 bg-gray-200 flex items-center justify-center">
-              <Package className="h-16 w-16 text-gray-400" />
-            </div>
-          )}
+          <div className="aspect-square w-full overflow-hidden bg-gray-100">
+            {currentImage ? (
+              <img
+                src={currentImage}
+                alt={product.name}
+                className="w-full h-full object-contain hover:scale-105 transition-transform duration-300"
+              />
+            ) : (
+              <div className="w-full h-full bg-gray-200 flex items-center justify-center">
+                <Package className="h-16 w-16 text-gray-400" />
+              </div>
+            )}
+          </div>
           
           {/* Botón de vista detallada */}
           <div className="absolute inset-0 bg-black bg-opacity-0 hover:bg-opacity-30 transition-opacity flex items-center justify-center opacity-0 hover:opacity-100">
@@ -140,7 +143,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
           <div className="flex items-center justify-between">
             <div>
               <span className="text-2xl font-bold text-primary-600">
-                ${product.price.toFixed(2)}
+                {formatPriceARS(product.price)}
               </span>
             </div>
             
