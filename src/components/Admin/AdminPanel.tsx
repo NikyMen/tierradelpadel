@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Package, BarChart3, Users, Settings, LogOut, Tag } from 'lucide-react';
+import { Plus, Package, BarChart3, Users, Settings, LogOut, Tag, X, Star } from 'lucide-react';
 import { ProductForm } from './ProductForm';
 import { ProductList } from './ProductList';
 import { CategoryForm } from './CategoryForm';
@@ -278,7 +278,7 @@ export const AdminPanel: React.FC = () => {
             <div>
               <h1 className="text-3xl font-bold text-gray-900">Panel de Administración</h1>
               <p className="mt-1 text-sm text-gray-500">
-                Gestiona la repuestera Repuestos Mendez
+                Gestiona Tierra del padel
               </p>
             </div>
             <div className="flex items-center space-x-4">

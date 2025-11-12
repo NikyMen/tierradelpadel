@@ -6,6 +6,7 @@ export interface Product {
   category: string;
   image?: string;
   images: string[];
+  featured?: boolean;
   createdAt?: string;
   updatedAt?: string;
 }
