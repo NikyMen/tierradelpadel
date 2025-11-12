@@ -45,6 +45,12 @@ export const Header: React.FC = () => {
               >
                 Productos
               </a>
+              <a
+                href="/nosotros"
+                className="text-gray-700 hover:text-primary-600 transition-colors"
+              >
+                Nosotros
+              </a>
             </nav>
 
             {/* Cart and Mobile Menu */}
@@ -84,6 +90,13 @@ export const Header: React.FC = () => {
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
                   Productos
+                </a>
+                <a
+                  href="/nosotros"
+                  className="block px-3 py-2 text-gray-700 hover:text-primary-600 transition-colors"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  Nosotros
                 </a>
                 <a
                   href="/admin"

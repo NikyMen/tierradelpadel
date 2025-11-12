@@ -1,0 +1,11 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { Header } from '../components/Header';
+import { AboutUs } from '../components/AboutUs';
+---
+
+<Layout title="Nosotros - Tierra del Padel" description="Conócenos: calidad, asesoramiento y servicio personalizado en pádel">
+  <Header client:load />
+  <AboutUs client:load />
+</Layout>
+
